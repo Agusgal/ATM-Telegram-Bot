@@ -1,13 +1,35 @@
 import csv, time
-import pandas as pd
 import geopy.distance
-
-file = open("cajeros-automaticos.csv")
-csvreader = csv.reader(file)
-header = next(csvreader)
-print(header)
+import numpy as np
 
 
+class Data:
+
+    def __init__(self, filename, indexfilter=None):
+        self.header, self.array = self.parseFile(filename, indexfilter)
+
+    def parseFile(self, filename, indexfilter=None):
+        file = open(filename)
+        reader = csv.reader(file)
+
+        header = np.array(next(reader))
+
+        rows = []
+        for row in reader:
+            if row[4] == indexfilter:
+                rows.append(row)
+            elif not indexfilter:
+                rows.append(row)
+
+        file.close()
+        return header, np.array(rows)
+
+    def getSortedArray(self, column):
+        return self.array[self.array[:, column].argsort()]
+
+
+#Performance test
+"""
 rows = []
 
 ubicacion = (-34.591709, -58.411303)
@@ -36,5 +58,5 @@ end = time.time()
 print("Busqueda de cajeros secuencial: ",(end-start),"sec")
 
 file.close()
-
+"""
 
