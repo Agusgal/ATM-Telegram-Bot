@@ -1,5 +1,4 @@
-import csv, time
-import geopy.distance
+import csv
 import numpy as np
 
 
@@ -30,6 +29,9 @@ class Data:
 
 #Performance test
 """
+import geopy.distance
+import time
+
 rows = []
 
 ubicacion = (-34.591709, -58.411303)

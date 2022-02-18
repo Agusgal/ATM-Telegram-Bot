@@ -65,23 +65,25 @@ class TelegramBot:
             msg += 'Dirección: {}'.format(atm[0][5]) + '\n'
             print('Debug')
         context.bot.send_message(chat_id=update.effective_chat.id, text=msg, parse_mode=ParseMode.HTML)
+        context.bot.send_photo(chat_id=update.effective_chat.id, photo=open('test.png', 'rb'))
 
     def searchbanks(self):
         self.loadbanks()
         sortd = self.data.getSortedArray(2)
 
-        #ubicacion = (-34.591709, -58.411303)
+        ubicacion = (-34.591709, -58.411303)
 
-        #hi = bsearch(sortd, -34.591709 + self.tolerance)
-        #lo = bsearch(sortd, -34.591709 - self.tolerance, low=hi)
+        hi = bsearch(sortd, -34.591709 + self.tolerance)
+        lo = bsearch(sortd, -34.591709 - self.tolerance, low=hi)
 
-        hi = bsearch(sortd, self.location.latitude + self.tolerance)
-        lo = bsearch(sortd, self.location.latitude - self.tolerance, low=hi)
+        #hi = bsearch(sortd, self.location.latitude + self.tolerance)
+        #lo = bsearch(sortd, self.location.latitude - self.tolerance, low=hi)
 
         atms = []
         for atm in sortd[hi:lo]:
             cajero = (atm[2], atm[1])
-            distance = geopy.distance.distance((self.location.latitude, self.location.longitude), cajero).km
+            distance = geopy.distance.distance((-34.591709, -58.411303), cajero).km
+            #distance = geopy.distance.distance((self.location.latitude, self.location.longitude), cajero).km
             if distance < 0.5:
                 atms.append([atm[0], distance])
 
