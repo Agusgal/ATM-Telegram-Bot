@@ -2,8 +2,10 @@ from telegram.ext import Updater, CommandHandler, PrefixHandler, MessageHandler,
 from telegram import Update, ParseMode, KeyboardButton, ReplyKeyboardMarkup
 from search import bsearch
 from data import Data
+from map import createMap
 import geopy.distance
 import numpy as np
+
 
 class TelegramBot:
 
@@ -63,27 +65,30 @@ class TelegramBot:
         for atm in self.nearestATMs:
             msg += '<b>{}</b>'.format(atm[0][3]) + '\n'
             msg += 'Dirección: {}'.format(atm[0][5]) + '\n'
-            print('Debug')
+
         context.bot.send_message(chat_id=update.effective_chat.id, text=msg, parse_mode=ParseMode.HTML)
-        context.bot.send_photo(chat_id=update.effective_chat.id, photo=open('test.png', 'rb'))
+
+        if len(self.nearestATMs):
+            self.generateMap()
+            context.bot.send_photo(chat_id=update.effective_chat.id, photo=open('map.png', 'rb'))
 
     def searchbanks(self):
         self.loadbanks()
         sortd = self.data.getSortedArray(2)
 
-        ubicacion = (-34.591709, -58.411303)
+        #ubicacion = (-34.591709, -58.411303)
 
-        hi = bsearch(sortd, -34.591709 + self.tolerance)
-        lo = bsearch(sortd, -34.591709 - self.tolerance, low=hi)
+        #hi = bsearch(sortd, -34.591709 + self.tolerance)
+        #lo = bsearch(sortd, -34.591709 - self.tolerance, low=hi)
 
-        #hi = bsearch(sortd, self.location.latitude + self.tolerance)
-        #lo = bsearch(sortd, self.location.latitude - self.tolerance, low=hi)
+        hi = bsearch(sortd, self.location.latitude + self.tolerance)
+        lo = bsearch(sortd, self.location.latitude - self.tolerance, low=hi)
 
         atms = []
         for atm in sortd[hi:lo]:
             cajero = (atm[2], atm[1])
-            distance = geopy.distance.distance((-34.591709, -58.411303), cajero).km
-            #distance = geopy.distance.distance((self.location.latitude, self.location.longitude), cajero).km
+            #distance = geopy.distance.distance((-34.591709, -58.411303), cajero).km
+            distance = geopy.distance.distance((self.location.latitude, self.location.longitude), cajero).km
             if distance < 0.5:
                 atms.append([atm[0], distance])
 
@@ -96,3 +101,10 @@ class TelegramBot:
 
     def loadbanks(self):
         self.data = Data('cajeros-automaticos.csv', indexfilter=self.bank.upper())
+
+    def generateMap(self):
+        points = []
+        for atm in self.nearestATMs:
+            points.append([float(atm[0][2]), float(atm[0][1])])
+
+        createMap(self.location.latitude, self.location.longitude, points)
