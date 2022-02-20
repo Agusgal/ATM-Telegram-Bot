@@ -159,6 +159,7 @@ class TelegramBot:
         context: CallbackContext
             contexto del mensaje, contiene al bot, etc
         """
+        self.nearestATMs = []
         self.location = update.message.location
         date = update.message.date
         newdate = date.replace(tzinfo=timezone.utc).astimezone(tz=None)
@@ -204,22 +205,22 @@ class TelegramBot:
         sortd = self.data.getSortedArray(2)
 
         #debug
-        hi = bsearch(sortd, -34.591709 + self.tolerance)
-        lo = bsearch(sortd, -34.591709 - self.tolerance, low=hi)
+        #hi = bsearch(sortd, -34.591709 + self.tolerance)
+        #lo = bsearch(sortd, -34.591709 - self.tolerance, low=hi)
         #debug
 
-        #hi = bsearch(sortd, self.location.latitude + self.tolerance)
-        #lo = bsearch(sortd, self.location.latitude - self.tolerance, low=hi)
+        hi = bsearch(sortd, self.location.latitude + self.tolerance)
+        lo = bsearch(sortd, self.location.latitude - self.tolerance, low=hi)
 
         atms = []
         for atm in sortd[hi:lo]:
             cajero = (atm[2], atm[1])
 
             #debug
-            distance = geopy.distance.distance((-34.591709, -58.411303), cajero).km
+            #distance = geopy.distance.distance((-34.591709, -58.411303), cajero).km
             #debug
 
-            #distance = geopy.distance.distance((self.location.latitude, self.location.longitude), cajero).km
+            distance = geopy.distance.distance((self.location.latitude, self.location.longitude), cajero).km
             if distance < 0.5:
                 atms.append([atm[0], distance])
 
@@ -240,10 +241,10 @@ class TelegramBot:
         for atm in self.nearestATMs:
             points.append([float(atm[2]), float(atm[1])])
 
-        #createMap(self.location.latitude, self.location.longitude, points)
+        createMap(self.location.latitude, self.location.longitude, points)
 
         #debug
-        createMap(-34.591709, -58.411303, points)
+        #createMap(-34.591709, -58.411303, points)
         #debug
 
     def bankLogic(self):
