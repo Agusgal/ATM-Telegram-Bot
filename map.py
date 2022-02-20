@@ -3,6 +3,20 @@ import tilemapbase
 
 
 def createMap(lat, long, points):
+    """
+    Crea mapa a partir de OpenStreetmaps y libreria tilemapbase, luego o guarda en formato png para enviarlo al usuario
+
+    Parametros:
+    ------------
+
+    lat: float
+        latitud del centro del mapa (grados)
+    long: float
+        longitud del centro del mapa (grados)
+    points: list
+        lista con puntos que quiere marcarse en el mapa (ubicacion de bancos)
+    """
+
     tilemapbase.init(create=True)
     t = tilemapbase.tiles.build_OSM()
     tol = 0.005
@@ -21,18 +35,12 @@ def createMap(lat, long, points):
     xc, yc = tilemapbase.project(long, lat)
     ax.plot(xc, yc, marker="v", color="firebrick", linewidth=20, markersize=15)
     for point in points:
-        x, y = tilemapbase.project(point[0], point[1])
+        x, y = tilemapbase.project(point[1], point[0])
         ax.plot(x, y, marker="*", color="b", linewidth=20, markersize=15)
 
     fig.savefig("map.png", dpi=200)
 
 
-#p1 = (-34.5883513486337, -58.4108953468498)
-#p2 = (-34.5904634090465, -58.4083852561492)
-#p3 = (-34.5909053874505, -58.41486)
-
-#latitud , longitud = (-34.591709, -58.411303)
-#ubicacion = (-58.411303709, -34.591709)
 
 
 

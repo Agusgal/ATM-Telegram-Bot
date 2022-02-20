@@ -2,7 +2,26 @@ import numpy as np
 
 
 def bsearch(arr: np.array, limit, low=0, high=None, key=None):
+    """
+    Algoritmo de busqueda binaria, toma un arreglo ordenado y encuentra lugares con datos < al limite
 
+    Parametros:
+    -------------
+    arr: np.array
+        arreglo donde se realiza la busqueda
+    limit: float
+        limite, se quier eencontrar el indice tal que se divida al arreglo en dos partes: una menor y otra mayor al limite
+    low: int
+        limite onferior denetro del arreglo donde se inicia la busqueda.
+    high: int
+        limite superior dentro del arreglo donde termina la busqueda
+
+    Retorna:
+    -----------
+    low: int
+        indice dentro del arreglo que lo divide tal que los elementos a su derecha son mayores a limite y los elementos
+        a su izquierda son menores
+    """
     if low < 0:
         raise ValueError('low must be non-negative')
     if high is None:

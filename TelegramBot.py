@@ -238,9 +238,13 @@ class TelegramBot:
 
         points = []
         for atm in self.nearestATMs:
-            points.append([float(atm[0][2]), float(atm[0][1])])
+            points.append([float(atm[2]), float(atm[1])])
 
-        createMap(self.location.latitude, self.location.longitude, points)
+        #createMap(self.location.latitude, self.location.longitude, points)
+
+        #debug
+        createMap(-34.591709, -58.411303, points)
+        #debug
 
     def bankLogic(self):
         """
