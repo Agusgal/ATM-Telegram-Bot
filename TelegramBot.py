@@ -193,14 +193,20 @@ class TelegramBot:
         """
         Busca los bancos más cercanos en un radio de 500 metros, utiliza la funcion bsearch de busqueda binaria para optimizar el proceso.
 
+        Returns:
+        --------
+        atms: list
+            lista de cajeros en un radio de 500 metros del usuario
         """
+
+        #Cargo bancos
         self.loadbanks()
         sortd = self.data.getSortedArray(2)
 
-        ubicacion = (-34.591709, -58.411303)
-
+        #debug
         hi = bsearch(sortd, -34.591709 + self.tolerance)
         lo = bsearch(sortd, -34.591709 - self.tolerance, low=hi)
+        #debug
 
         #hi = bsearch(sortd, self.location.latitude + self.tolerance)
         #lo = bsearch(sortd, self.location.latitude - self.tolerance, low=hi)
@@ -208,7 +214,11 @@ class TelegramBot:
         atms = []
         for atm in sortd[hi:lo]:
             cajero = (atm[2], atm[1])
+
+            #debug
             distance = geopy.distance.distance((-34.591709, -58.411303), cajero).km
+            #debug
+
             #distance = geopy.distance.distance((self.location.latitude, self.location.longitude), cajero).km
             if distance < 0.5:
                 atms.append([atm[0], distance])
@@ -216,9 +226,16 @@ class TelegramBot:
         return atms
 
     def loadbanks(self):
+        """
+        Carga bancos en objeto Data
+        """
         self.data = Data('cajeros-automaticos.csv', indexfilter=self.network.upper())
 
     def generateMap(self):
+        """
+        Crea mapa de zona cercana al usuario utilizando OpenStreetmaps
+        """
+
         points = []
         for atm in self.nearestATMs:
             points.append([float(atm[0][2]), float(atm[0][1])])
@@ -226,6 +243,12 @@ class TelegramBot:
         createMap(self.location.latitude, self.location.longitude, points)
 
     def bankLogic(self):
+        """
+        Logica de bancos, carga los bancos que tuvieron extracciones recientemente, y chequea que tengan dinero
+        basandose en el momento de la ultima extraccion. Ademas de haber mas de 3 cajeros que cumplen los criterios
+        se utilizan los 3 mas cercanos y se actualiza la abse de datos.
+        """
+
         tolerance = 100
         bankDict = getBankData()
 
@@ -242,20 +265,21 @@ class TelegramBot:
                 if self.checkRestock(self.datetime, lastwithdrawal):
                     bankDict['withdrawals'][index] = 1000
 
-
+                #Si no hay mas dinero se elimina el cajero
                 if (atm[0] in bankDict['id']) and (bankDict['withdrawals'][index] < tolerance):
                     self.nearestATMs.remove(atm)
-                    print('Se saco el cajero con el id', atm[0], 'Porque no tiene plata. ')
 
         if len(self.nearestATMs) > 3:
             self.nearestATMs = self.nearestATMs[:3]
 
+        #Se actualiza la base de datos (diccionario que luego se guarda)
         for atm in self.nearestATMs:
             if atm[0] not in bankDict['id']:
                 bankDict['id'].append(atm[0])
                 bankDict['withdrawals'].append(1000)
                 bankDict['lastwithdrawal'].append(self.formatdate())
 
+        #Actualiza el estimado de recargas restantes
         for ind, atm in enumerate(self.nearestATMs):
             index = bankDict['id'].index(atm[0])
             if len(self.nearestATMs) == 3:
@@ -273,13 +297,37 @@ class TelegramBot:
             elif len(self.nearestATMs) == 1:
                 bankDict['withdrawals'][index] -= 1
             bankDict['lastwithdrawal'][index] = self.formatdate()
+
+        #Cargo nueva data al archivo
         loadBankData(bankDict)
 
     def formatdate(self):
+        """
+        Crea timestamp formateada para gusardar fecha.
+        Retorna:
+        ---------
+        timestamp:
+            data de fecha formateada
+        """
+
         timestamp = self.datetime.strftime('%d/%m/%y %H:%M')
         return timestamp
 
     def checkRestock(self, now, last):
+        """
+        Chequea que haya habido un restock de dinero en el cajero entre el tiempo de consulta (now) y la ultima consulta (last)
+
+        Parametros:
+        ----------
+        now: datetime.Datetime
+            objeto datetime con la informacion del horario de la consulta actual a la API.
+        last: datetime.Datetime
+            objeto datetime con la informacion del horario de la ultima consulta a la API.
+
+        Retorna:
+        ----------
+        True si hubo recarga, False si no.
+        """
         if now.day == last.day:
             if (now.weekday() < 5) and (last.hour < 8) and (now.hour > 8):
                 return True
