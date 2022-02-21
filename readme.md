@@ -1,4 +1,4 @@
-#Evaluación técnica Jampp: Bot de Telegram
+# Evaluación técnica Jampp: Bot de Telegram
 
 En el siguiente proyecto se implementó un bot de telegram que lista los cajeros automáticos más cercanos de la
 red seleccionada y muestra un mapa con su ubicación precisa. 
@@ -7,7 +7,7 @@ En el siguiente repositorio puede encontrarse el proyecto completo: https://gith
 
 Para encontrar el bot debe buscarse como: @BsAsATMbot
 
-##Bibliotecas requeridas:
+## Bibliotecas requeridas:
 
 - Python-Telegram-Bot: interfaz intermedia para manejar API de Telegram
                        documentación disponible en https://python-telegram-bot.readthedocs.io/en/stable/
@@ -21,7 +21,7 @@ Para encontrar el bot debe buscarse como: @BsAsATMbot
 - Csv: manjeo de archivo Csv 
 - Json: almacenamiento de datos de cajeros utilizados.
 
-##Instrucciones de uso:
+## Instrucciones de uso:
 
 Para poder ejecutar el programa solamente hace falta colocarse en el directorio donde resida el proyecto y
 correr el siguiente comando en una terminal: 
@@ -30,7 +30,7 @@ correr el siguiente comando en una terminal:
 
 Se utilizó la versión 3.8 de Python para desarrollar el proyecto.
 
-##Elecciones de Diseño relevantes:
+## Elecciones de Diseño relevantes:
 
 - El bot posee los siguientes comandos: 'help', el cual muestra todos los comandos disponibles, 'start' se inicia la 
 conversación con el bot, 'link' y 'banelco', muestran información acerca de cajeros 
